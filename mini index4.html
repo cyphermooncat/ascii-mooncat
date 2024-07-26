@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>aN en ASCII Art - Chat Heureux</title>
+    <style>
+body {
+    font-family: monospace;
+    white-space: pre;
+    background-color: black;
+    color: green;
+    margin: 0;
+    height: 100vh;
+    display: grid;
+    place-items: center;
+}
+
+        #frame {
+            text-align: center;
+        }
+        #aN {
+            font-size: 16px;
+            line-height: 1;
+        }
+        #mS {
+            margin-top: 20px;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div id="frame">
+        <div id="aN"></div>
+        <div id="mS"><3 MOONCATS TO THE MOON <3</div>
+    </div>
+
+    <script>
+        const cA = [
+            " /\\_/\\ ",
+            "( o.o )",
+            " > ^ < "
+        ];
+
+        const sta = "*";
+        const plA = ["O", "o", "0"];
+        const spA = "===>";
+        const mA = [
+            "  ___  ",
+            " /   \\ ",
+            "|  M  |",
+            " \\___/ "
+        ];
+
+        const width = 40;
+        const height = 20;
+        let x = Math.floor(Math.random() * (width - cA[0].length));
+        let y = Math.floor(Math.random() * (height - cA.length));
+        let dx = 1;
+        let dy = 1;
+        let aNR = true;
+
+        const st = [
+            { x: 10, y: 2, visible: true },
+            { x: 30, y: 5, visible: true },
+            { x: 17, y: 9, visible: true },
+            { x: 5, y: 15, visible: true },
+            { x: 35, y: 17, visible: true }
+        ];
+
+        const pl = [
+            { x: 15, y: 3, size: 0, dx: 1, dy: 1 },
+            { x: 20, y: 18, size: 1, dx: -1, dy: -1 }
+        ];
+
+        const ss = [
+            { x: 5, y: 7, dx: 1 },
+            { x: 0, y: 12, dx: 1 }
+        ];
+
+        const mN = { x: 21, y: 10 };
+
+        const aND = document.getElementById('aN');
+        const mSD = document.getElementById('mS');
+
+        function ani() {
+    if (!aNR) return;
+
+    let frame = '+----------------------------------------+\n';
+
+    for (let i = 0; i < height; i++) {
+        let lN = '|';
+        for (let j = 0; j < width; j++) {
+            let isC = (i >= y && i < y + cA.length && j >= x && j < x + cA[0].length);
+            let isS = st.some(star => star.x === j && star.y === i && star.visible);
+            let pt = pl.find(pt => pt.x === j && pt.y === i);
+            let sc = ss.find(sh => i === sh.y && j >= sh.x && j < sh.x + spA.length);
+            let ismN = (i >= mN.y && i < mN.y + mA.length && j >= mN.x && j < mN.x + mA[0].length);
+
+            if (isC) {
+                lN += cA[i - y][j - x];
+            } else if (isS) {
+                lN += sta;
+            } else if (pt) {
+                lN += plA[pt.size];
+            } else if (sc) {
+                lN += spA[j - sc.x];
+            } else if (ismN) {
+                lN += mA[i - mN.y][j - mN.x];
+            } else {
+                lN += ' ';
+            }
+        }
+        lN += '|\n';
+        frame += lN;
+    }
+
+    frame += '+----------------------------------------+';
+    aND.textContent = frame;
+
+    // Calculer le centre du chat
+    const cCX = x + Math.floor(cA[0].length / 2);
+    const cCY = y + Math.floor(cA.length / 2);
+
+    // Calculer le centre de la lune
+    const mNX = mN.x + Math.floor(mA[0].length / 2);
+    const mNY = mN.y + Math.floor(mA.length / 2);
+
+    // Vérifier si le centre du chat atteint le centre de la lune
+    if (cCX === mNX && cCY === mNY) {
+        aNR = false;
+        mSD.textContent = "YOU REACH THE MOON, WIN !!!";
+        return;
+    }
+
+    // Mettre à jour la position du chat
+    if (x + dx < 0 || x + dx + cA[0].length > width) {
+        dx *= -1;
+    }
+    if (y + dy < 0 || y + dy + cA.length > height) {
+        dy *= -1;
+    }
+    x += dx;
+    y += dy;
+
+    // Mettre à jour la visibilité des étoiles
+    st.forEach(star => star.visible = !star.visible);
+
+    // Mettre à jour la position des planètes
+    pl.forEach(pt => {
+        if (pt.x + pt.dx < 0 || pt.x + pt.dx >= width || (pt.x + pt.dx >= mN.x && pt.x + pt.dx < mN.x + mA[0].length && pt.y + pt.dy >= mN.y && pt.y + pt.dy < mN.y + mA.length)) {
+            pt.dx *= -1;
+        }
+        if (pt.y + pt.dy < 0 || pt.y + pt.dy >= height || (pt.x >= mN.x && pt.x < mN.x + mA[0].length && pt.y + pt.dy >= mN.y && pt.y + pt.dy < mN.y + mA.length)) {
+            pt.dy *= -1;
+        }
+        pt.x += pt.dx;
+        pt.y += pt.dy;
+    });
+
+    // Mettre à jour la position des vaisseaux spatiaux
+    ss.forEach(sh => {
+        if (sh.x + sh.dx < 0 || sh.x + sh.dx + spA.length > width || (sh.x + sh.dx >= mN.x && sh.x + sh.dx < mN.x + mA[0].length && sh.y >= mN.y && sh.y < mN.y + mA.length)) {
+            sh.dx *= -1;
+        }
+        sh.x += sh.dx;
+    });
+
+    setTimeout(ani, 200);
+}
+
+
+        ani();
+    </script>
+</body>
+</html>
