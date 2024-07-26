@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animation en ASCII Art - Chat Heureux</title>
+    <style>
+        body {font-family: impact; white-space: pre; background-color: black; color: green; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; flex-direction: column;}
+        #animation {font-size: 16px; line-height: 1;}
+        #message {margin-top: 20px; font-size: 24px;}
+    </style>
+</head>
+<body>
+    <div id="animation"></div>
+    <div id="message">MOONCAT TO THE MOON</div>
+    <script>
+        const cat = [" /\\_/\\ ","( o.o )"," > ^ < "], star = "*", planets = ["O", "o", "0"], ship = "===>", moon = ["  ___  "," /   \\ ","|     |"," \\___/ "], w = 40, h = 20;
+        let cx = 0, cy = 0, dx = 1, dy = 1, stars = [{x: 10, y: 2, v: true}, {x: 30, y: 5, v: true}, {x: 20, y: 10, v: true}, {x: 5, y: 15, v: true}, {x: 35, y: 17, v: true}],
+        plns = [{x: 15, y: 3, s: 0, dx: 1, dy: 1}, {x: 25, y: 12, s: 1, dx: -1, dy: -1}], ships = [{x: 5, y: 7, dx: 1}, {x: 0, y: 10, dx: 1}], moonPos = {x: 20, y: 8}, anim = document.getElementById('animation');
+
+        function draw() {
+            let frame = '';
+            for (let i = 0; i < h; i++) {
+                let line = '';
+                for (let j = 0; j < w; j++) {
+                    let isCat = (i >= cy && i < cy + cat.length && j >= cx && j < cx + cat[0].length), isStar = stars.some(s => s.x === j && s.y === i && s.v), 
+                    planet = plns.find(p => p.x === j && p.y === i), isShip = ships.find(sh => i === sh.y && j >= sh.x && j < sh.x + ship.length), 
+                    isMoon = (i >= moonPos.y && i < moonPos.y + moon.length && j >= moonPos.x && j < moonPos.x + moon[0].length);
+
+                    if (isCat) line += cat[i - cy][j - cx];
+                    else if (isStar) line += star;
+                    else if (planet) line += planets[planet.s];
+                    else if (isShip) line += ship[j - isShip.x];
+                    else if (isMoon) line += moon[i - moonPos.y][j - moonPos.x];
+                    else line += ' ';
+                }
+                frame += line + '\n';
+            }
+
+            anim.textContent = frame;
+
+            if (cx + dx < 0 || cx + dx + cat[0].length > w || (cx + dx >= moonPos.x && cx + dx < moonPos.x + moon[0].length && cy + dy >= moonPos.y && cy + dy < moonPos.y + moon.length)) dx *= -1;
+            if (cy + dy < 0 || cy + dy + cat.length > h || (cx >= moonPos.x && cx < moonPos.x + moon[0].length && cy + dy >= moonPos.y && cy + dy < moonPos.y + moon.length)) dy *= -1;
+            cx += dx; cy += dy;
+
+            stars.forEach(s => s.v = !s.v);
+
+            plns.forEach(p => {
+                if (p.x + p.dx < 0 || p.x + p.dx >= w || (p.x + p.dx >= moonPos.x && p.x + p.dx < moonPos.x + moon[0].length && p.y + p.dy >= moonPos.y && p.y + p.dy < moonPos.y + moon.length)) p.dx *= -1;
+                if (p.y + p.dy < 0 || p.y + p.dy >= h || (p.x >= moonPos.x && p.x < moonPos.x + moon[0].length && p.y + p.dy >= moonPos.y && p.y + p.dy < moonPos.y + moon.length)) p.dy *= -1;
+                p.x += p.dx; p.y += p.dy;
+            });
+
+            ships.forEach(sh => {
+                if (sh.x + sh.dx < 0 || sh.x + sh.dx + ship.length > w || (sh.x + sh.dx >= moonPos.x && sh.x + sh.dx < moonPos.x + moon[0].length && sh.y >= moonPos.y && sh.y < moonPos.y + moon.length)) sh.dx *= -1;
+                sh.x += sh.dx;
+            });
+
+            setTimeout(draw, 200);
+        }
+        draw();
+    </script>
+</body>
+</html>

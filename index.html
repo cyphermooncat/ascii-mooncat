@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animation en ASCII Art - Chat Heureux</title>
+    <style>
+        body {
+            font-family: monospace;
+            white-space: pre;
+            background-color: black;
+            color: green;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+        #animation {
+            font-size: 16px;
+            line-height: 1;
+        }
+        #message {
+            margin-top: 20px;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div id="animation"></div>
+    <div id="message">Mooncat to the Moon</div>
+
+    <script>
+        const catArt = [
+            " /\\_/\\ ",
+            "( o.o )",
+            " > ^ < "
+        ];
+
+        const starArt = "*";
+        const planetArt = "O";
+        const spaceshipArt = "===>";
+
+        const width = 40;
+        const height = 20;
+        let x = 0;
+        let y = 0;
+        let dx = 1;
+        let dy = 1;
+
+        const stars = [
+            { x: 10, y: 2 },
+            { x: 30, y: 5 },
+            { x: 20, y: 10 },
+            { x: 5, y: 15 },
+            { x: 35, y: 17 }
+        ];
+
+        const planets = [
+            { x: 15, y: 3 },
+            { x: 25, y: 12 }
+        ];
+
+        const spaceship = { x: 5, y: 7, dx: 1 };
+
+        const animationDiv = document.getElementById('animation');
+
+        function animate() {
+            let frame = '';
+
+            for (let i = 0; i < height; i++) {
+                let line = '';
+                for (let j = 0; j < width; j++) {
+                    let isCat = (i >= y && i < y + catArt.length && j >= x && j < x + catArt[0].length);
+                    let isStar = stars.some(star => star.x === j && star.y === i);
+                    let isPlanet = planets.some(planet => planet.x === j && planet.y === i);
+                    let isSpaceship = (i === spaceship.y && j >= spaceship.x && j < spaceship.x + spaceshipArt.length);
+
+                    if (isCat) {
+                        line += catArt[i - y][j - x];
+                    } else if (isStar) {
+                        line += starArt;
+                    } else if (isPlanet) {
+                        line += planetArt;
+                    } else if (isSpaceship) {
+                        line += spaceshipArt[j - spaceship.x];
+                    } else {
+                        line += ' ';
+                    }
+                }
+                frame += line + '\n';
+            }
+
+            animationDiv.textContent = frame;
+
+            if (x + dx < 0 || x + dx + catArt[0].length > width) {
+                dx *= -1;
+            }
+            if (y + dy < 0 || y + dy + catArt.length > height) {
+                dy *= -1;
+            }
+
+            if (spaceship.x + spaceship.dx < 0 || spaceship.x + spaceship.dx + spaceshipArt.length > width) {
+                spaceship.dx *= -1;
+            }
+
+            x += dx;
+            y += dy;
+            spaceship.x += spaceship.dx;
+
+            setTimeout(animate, 200);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
